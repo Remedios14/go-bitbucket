@@ -288,7 +288,8 @@ func (r *Repository) Get(ro *RepositoryOptions) (*Repository, error) {
 }
 
 func (r *Repository) buildContentsURL(ro *RepositoryFilesOptions) (string, error) {
-	filePath := path.Join("/repositories", ro.Owner, ro.RepoSlug, "src", ro.Ref, ro.Path) + "/"
+	//filePath := path.Join("/repositories", ro.Owner, ro.RepoSlug, "src", ro.Ref, ro.Path) + "/"
+	filePath := path.Join("/repos", ro.RepoSlug, "browse", ro.Path) + "/"
 
 	urlStr := r.c.requestUrl(filePath)
 	url, err := url.Parse(urlStr)
@@ -322,7 +323,7 @@ func (r *Repository) GetFileContent(ro *RepositoryFilesOptions) ([]byte, error) 
 	return content, nil
 }
 
-func (r *Repository) ListFiles(ro *RepositoryFilesOptions) ([]RepositoryFile, error) {
+func (r *Repository) ListFiles(ro *RepositoryFilesOptions) (map[string]interface{}, error) {
 	urlStr, err := r.buildContentsURL(ro)
 	if err != nil {
 		return nil, err
@@ -1202,20 +1203,22 @@ func decodeRepository(repoResponse interface{}) (*Repository, error) {
 	return repository, nil
 }
 
-func decodeRepositoryFiles(repoResponse interface{}) ([]RepositoryFile, error) {
+func decodeRepositoryFiles(repoResponse interface{}) (map[string]interface{}, error) {
 	repoFileMap := repoResponse.(map[string]interface{})
 
-	if repoFileMap["type"] == "error" {
+	if repoFileMap["children"] == nil {
 		return nil, DecodeError(repoFileMap)
 	}
 
-	var repositoryFiles = new([]RepositoryFile)
-	err := mapstructure.Decode(repoFileMap["values"], repositoryFiles)
-	if err != nil {
-		return nil, err
-	}
+	repoDirFiles := repoFileMap["children"].(map[string]interface{})
 
-	return *repositoryFiles, nil
+	//var repositoryFiles = new([]RepositoryFile)
+	//err := mapstructure.Decode(repoFileMap["values"], repositoryFiles)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	return repoDirFiles, nil
 }
 
 func decodeRepositoryRefs(refResponseStr string) (*RepositoryRefs, error) {
