@@ -1212,11 +1212,11 @@ func decodeRepositoryFiles(repoResponse interface{}) (map[string]interface{}, er
 
 	repoDirFiles := repoFileMap["children"].(map[string]interface{})
 
-	//var repositoryFiles = new([]RepositoryFile)
-	//err := mapstructure.Decode(repoFileMap["values"], repositoryFiles)
-	//if err != nil {
-	//	return nil, err
-	//}
+	var repositoryFiles = new([]RepositoryFile)
+	err := mapstructure.Decode(repoFileMap["values"], repositoryFiles)
+	if err != nil {
+		return nil, err
+	}
 
 	return repoDirFiles, nil
 }

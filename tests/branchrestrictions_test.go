@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ktrysmt/go-bitbucket"
+	"github.com/Remedios14/go-bitbucket"
 )
 
 var (
