@@ -166,6 +166,17 @@ func NewOAuthbearerToken(t string) *Client {
 	return injectClient(a)
 }
 
+func NewOAuthbearerTokenWithUrl(t string, urlStr string) (c *Client) {
+	a := &auth{bearerToken: t}
+	a_url, err := url.Parse(urlStr)
+	if err != nil {
+		c = injectClient(a)
+	} else {
+		c = injectClientWithUrl(a, a_url)
+	}
+	return
+}
+
 func NewBasicAuth(u, p string) *Client {
 	a := &auth{user: u, password: p}
 	return injectClient(a)
@@ -176,8 +187,13 @@ func injectClient(a *auth) *Client {
 	if err != nil {
 		log.Fatalf("invalid bitbucket url")
 	}
+	c := injectClientWithUrl(a, bitbucketUrl)
+	return c
+}
+
+func injectClientWithUrl(a *auth, a_url *url.URL) *Client {
 	c := &Client{Auth: a, Pagelen: DEFAULT_PAGE_LENGTH, MaxDepth: DEFAULT_MAX_DEPTH,
-		apiBaseURL: bitbucketUrl, LimitPages: DEFAULT_LIMIT_PAGES}
+		apiBaseURL: a_url, LimitPages: DEFAULT_LIMIT_PAGES}
 	c.Repositories = &Repositories{
 		c:                  c,
 		PullRequests:       &PullRequests{c: c},
